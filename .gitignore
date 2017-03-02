@@ -1,0 +1,12 @@
+*.iml
+*.ipr
+*.iws
+*.log
+
+.gradle/
+.idea/
+
+build/
+gradle.properties
+/src/main/resources/static/lib
+/src/*main/resources/application-*.yml
