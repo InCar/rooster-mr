@@ -45,7 +45,6 @@ public class TelemetryService {
         while (true) {
             GetRangeResponse getRangeResponse = client.getRange(new GetRangeRequest(rangeRowQueryCriteria));
             for (Row row : getRangeResponse.getRows()) {
-                System.out.println("Telemetry Row: " + row);
                 String key = row.getPrimaryKey().getPrimaryKeyColumn(PRIMARY_KEY_NAME).getValue().asString();
                 String data = row.getLatestColumn("data").getValue().asString();
                 System.out.println("Telemetry Data: " + data);
@@ -72,13 +71,16 @@ public class TelemetryService {
         {
             String vin = key.substring(4,21);
             String obdCode = vin;
-            String longitude = String.valueOf(json.getDouble("lon"));
-            String latitude = String.valueOf(json.getDouble("lat"));
+            String longitude = "E" + String.valueOf(json.getDouble("lon"));
+            String latitude = "N" + String.valueOf(json.getDouble("lat"));
             String time = key.substring(key.length()-14,key.length());
-            Timestamp timestamp = new Timestamp(DateUtil.parseStrToDate(time,"yyyyMMddHHmmss").getTime());
+            long millSeconds = DateUtil.parseStrToDate(time,"yyyyMMddHHmmss").getTime();
+            int tripId = (int)(millSeconds/86400000D);
+            Timestamp timestamp = new Timestamp(millSeconds);
 
-            ObdLocation obdLocation = new ObdLocation(obdCode,vin,longitude,latitude,timestamp);
-            obdLocationRepository.save(obdLocation);
+            ObdLocation obdLocation = new ObdLocation(obdCode,tripId,vin,longitude,latitude,timestamp);
+            ObdLocation returnObdLocation = obdLocationRepository.save(obdLocation);
+            System.out.println(returnObdLocation);
         }
     }
 

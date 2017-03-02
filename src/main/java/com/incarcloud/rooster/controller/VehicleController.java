@@ -31,6 +31,6 @@ public class VehicleController {
     {
         Date dateBegin = DateUtil.parseStrToDate(dateBeginStr,"yyyyMMdd");
         Date dateEnd = DateUtil.parseStrToDate(dateEndStr,"yyyyMMdd");
-        vehicleService.transferAllVehiclePos(dateBegin,dateEnd);
+        vehicleService.transferAllVehicle(dateBegin,dateEnd);
     }
 }

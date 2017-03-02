@@ -15,6 +15,8 @@ public class ObdLocation {
     private Integer id;
     @Column(name = "obdcode")
     private String obdCode;
+    @Column(name = "tripid")
+    private Integer tripId;
     private String vin;
     private String longitude;
     private String latitude;
@@ -24,8 +26,9 @@ public class ObdLocation {
     public ObdLocation() {
     }
 
-    public ObdLocation(String obdCode, String vin, String longitude, String latitude, Timestamp locationTime) {
+    public ObdLocation(String obdCode, Integer tripId, String vin, String longitude, String latitude, Timestamp locationTime) {
         this.obdCode = obdCode;
+        this.tripId = tripId;
         this.vin = vin;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -46,6 +49,14 @@ public class ObdLocation {
 
     public void setObdCode(String obdCode) {
         this.obdCode = obdCode;
+    }
+
+    public Integer getTripId() {
+        return tripId;
+    }
+
+    public void setTripId(Integer tripId) {
+        this.tripId = tripId;
     }
 
     public String getVin() {

@@ -4,7 +4,6 @@ version '1.0.1'
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'idea'
-apply plugin: 'org.flywaydb.flyway'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -15,7 +14,6 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.+")
-        classpath("org.flywaydb:flyway-gradle-plugin:4.0.+")
     }
 }
 
