@@ -4,6 +4,7 @@ import com.incarcloud.rooster.entity.ObdLocation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -13,6 +14,7 @@ import java.util.Date;
 public interface ObdLocationRepository extends JpaRepository<ObdLocation,Integer> {
 
     @Modifying
+    @Transactional
     @Query("delete from ObdLocation o where o.vin = ?1 and o.locationTime >= ?2 and o.locationTime <= ?3")
     void deleteByVinAndTime(String vin, Date dateBegin, Date dateEnd);
 }
