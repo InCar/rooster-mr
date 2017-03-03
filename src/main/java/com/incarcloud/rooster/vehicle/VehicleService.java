@@ -4,6 +4,7 @@ import com.alicloud.openservices.tablestore.SyncClient;
 import com.alicloud.openservices.tablestore.model.*;
 import com.incarcloud.rooster.entity.Car;
 import com.incarcloud.rooster.repository.CarRepository;
+import com.incarcloud.rooster.telemetry.TelemetryFlag;
 import com.incarcloud.rooster.telemetry.TelemetryService;
 import com.incarcloud.rooster.utils.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,6 @@ public class VehicleService {
     private static String PRIMARY_KEY_NAME = "key";
     private static String TELEMETRY_POS_TYPE = "TriAdas.Pos####";
 
-
     /**
      * 转存车辆位置数据
      * @param dateBegin 日期范围起始
@@ -68,9 +68,13 @@ public class VehicleService {
             for (Row row : getRangeResponse.getRows()) {
                 String key = row.getPrimaryKey().getPrimaryKeyColumn(PRIMARY_KEY_NAME).getValue().asString();
                 System.out.println("Vehicle Key: " + key);
+
                 transferVehicle(key);                                // 转存单个车辆数据
-                deleteVehiclePos(key,dateBegin,dateEnd);             // 删除单个车辆整天位置数据
+
+                deleteVehicleData(key,dateBegin,dateEnd);             // 删除单个车辆整天数据
                 transferVehiclePos(client,key,dateBegin,dateEnd);    // 转存单个车辆整天位置数据
+                transferVehicleMobileye(client, key, dateBegin, dateEnd); // 转存单个车辆Mobileye数据
+
             }
             // 若nextStartPrimaryKey不为null, 则继续读取.
             if (getRangeResponse.getNextStartPrimaryKey() != null) {
@@ -103,7 +107,7 @@ public class VehicleService {
      * 删除整天的数据
      * @param key
      */
-    public void deleteVehiclePos(String key, Date dateBegin, Date dateEnd)
+    public void deleteVehicleData(String key, Date dateBegin, Date dateEnd)
     {
         String vin = key.substring(4,21);
         telemetryService.deleteByVinAndTime(vin,dateBegin,dateEnd);
@@ -119,6 +123,14 @@ public class VehicleService {
     {
         String startPkValue = key + TELEMETRY_POS_TYPE + DateUtil.getDateStr(dateBegin,"yyyyMMddHHmmss");
         String endPkValue = key + TELEMETRY_POS_TYPE + DateUtil.getDateStr(dateEnd,"yyyyMMddHHmmss");
-        telemetryService.transferPosTelemetry(client,startPkValue,endPkValue);
+        telemetryService.transferTelemetry(client,startPkValue,endPkValue, TelemetryFlag.Position);
+    }
+
+    public void transferVehicleMobileye(SyncClient client, String key, Date dateBegin, Date dateEnd){
+        final String TELEMETRY_MOBILEYE = "TriAdas.MobiEye";
+
+        String startPkValue = key + TELEMETRY_MOBILEYE + DateUtil.getDateStr(dateBegin,"yyyyMMddHHmmss");
+        String endPkValue = key + TELEMETRY_MOBILEYE + DateUtil.getDateStr(dateEnd,"yyyyMMddHHmmss");
+        telemetryService.transferTelemetry(client,startPkValue,endPkValue, TelemetryFlag.Mobileye);
     }
 }

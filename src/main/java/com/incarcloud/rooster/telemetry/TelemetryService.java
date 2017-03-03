@@ -2,7 +2,9 @@ package com.incarcloud.rooster.telemetry;
 
 import com.alicloud.openservices.tablestore.SyncClient;
 import com.alicloud.openservices.tablestore.model.*;
+import com.incarcloud.rooster.entity.MobileyeSTD;
 import com.incarcloud.rooster.entity.ObdLocation;
+import com.incarcloud.rooster.repository.MobileyeSTDRepository;
 import com.incarcloud.rooster.repository.ObdLocationRepository;
 import com.incarcloud.rooster.utils.DateUtil;
 import org.json.JSONObject;
@@ -22,6 +24,9 @@ public class TelemetryService {
     @Autowired
     ObdLocationRepository obdLocationRepository;
 
+    @Autowired
+    MobileyeSTDRepository mobileyeSTDRepository;
+
     private static String TABLE_NAME = "telemetry";
     private static String PRIMARY_KEY_NAME = "key";
 
@@ -31,7 +36,7 @@ public class TelemetryService {
      * @param startPkValue 主键范围起始
      * @param endPkValue 主键范围结束
      */
-    public void transferPosTelemetry(SyncClient client, String startPkValue, String endPkValue)
+    public void transferTelemetry(SyncClient client, String startPkValue, String endPkValue, TelemetryFlag flag)
     {
         RangeRowQueryCriteria rangeRowQueryCriteria = new RangeRowQueryCriteria(TABLE_NAME);
         // 设置起始主键
@@ -49,7 +54,10 @@ public class TelemetryService {
                 String key = row.getPrimaryKey().getPrimaryKeyColumn(PRIMARY_KEY_NAME).getValue().asString();
                 String data = row.getLatestColumn("data").getValue().asString();
                 System.out.println("Telemetry Data: " + data);
-                transferOnePosTelemetry(key,data);   // 转存单条位置数据
+                if(flag == TelemetryFlag.Position)
+                    transferOnePos(key,data);   // 转存单条位置数据
+                else if(flag == TelemetryFlag.Mobileye)
+                    transferOneMobileye(key, data); // Mobileye
             }
             // 若nextStartPrimaryKey不为null, 则继续读取.
             if (getRangeResponse.getNextStartPrimaryKey() != null) {
@@ -64,7 +72,7 @@ public class TelemetryService {
      * 转存单条位置数据
      * @param data 位置数据
      */
-    public void transferOnePosTelemetry(String key, String data)
+    public void transferOnePos(String key, String data)
     {
         JSONObject json = new JSONObject(data);
         boolean valid = json.getBoolean("valid");
@@ -88,6 +96,45 @@ public class TelemetryService {
     public void deleteByVinAndTime(String vin, Date dateBegin, Date dateEnd)
     {
         obdLocationRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
+        mobileyeSTDRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
     }
 
+
+    public void transferOneMobileye(String key, String data){
+        // { "sound":"Silent","daylight":"Day","stopped":false,
+        //  "headway":{"seconds":-1,"level":0,"repeatable":false},
+        //  "LDW":{"isOff":false,"left":false,"right":false},
+        //  "TamperAlert":false,"FCW":false,"PedsFCW":false,"PedsDZ":false,
+        //  "TSR":{"enabled":false,"level":0},
+        //  "maintenance":false,"failsafe":false,"error":0 } -> t_mobileye_std
+
+        JSONObject json = new JSONObject(data);
+        JSONObject jsonHeadway = json.getJSONObject("headway");
+        JSONObject jsonLDW = json.getJSONObject("LDW");
+        JSONObject jsonTSR = json.getJSONObject("TSR");
+
+        MobileyeSTD entry = new MobileyeSTD();
+        entry.setVin(key.substring(4, 21));
+        entry.setTm(DateUtil.parseStrToDate(key.substring(key.length()-14,key.length()), "yyyyMMddHHmmss"));
+        entry.setSound(json.getString("sound"));
+        entry.setDaylight(json.getString("daylight"));
+        entry.setStopped(json.getBoolean("stopped"));
+        entry.setHeadway((float)jsonHeadway.getDouble("seconds"));
+        entry.setHeadwayWarningLvl(jsonHeadway.getInt("level"));
+        entry.setHeadwayRepeateable(jsonHeadway.getBoolean("repeatable"));
+        entry.setLdwOff(jsonLDW.getBoolean("isOff"));
+        entry.setLdwLeft(jsonLDW.getBoolean("left"));
+        entry.setLdwRight(jsonLDW.getBoolean("right"));
+        entry.setFcw(json.getBoolean("FCW"));
+        entry.setPedsFcw(json.getBoolean("PedsFCW"));
+        entry.setPedsDz(json.getBoolean("PedsDZ"));
+        entry.setTamperAlert(json.getBoolean("TamperAlert"));
+        entry.setTsrEnabled(jsonTSR.getBoolean("enabled"));
+        entry.setTsrLevel(jsonTSR.getInt("level"));
+        entry.setMaintenance(json.getBoolean("maintenance"));
+        entry.setFailSafe(json.getBoolean("failsafe"));
+        entry.setErrorCode(json.getInt("error"));
+
+        mobileyeSTDRepository.save(entry);
+    }
 }
