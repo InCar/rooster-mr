@@ -4,8 +4,11 @@ import javax.persistence.*;
 import java.util.*;
 
 @Entity
-@Table(name = "t_car")
+@Table(name = "t_mobileye_std")
 public class MobileyeSTD {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String vin;
     private Date tm;
     private String sound;
