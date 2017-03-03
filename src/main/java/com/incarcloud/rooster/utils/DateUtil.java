@@ -1,6 +1,7 @@
 package com.incarcloud.rooster.utils;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -57,5 +58,42 @@ public class DateUtil {
         calendar.setTime(date);
         calendar.add(Calendar.MINUTE,mins);
         return calendar.getTime();
+    }
+
+    /**
+     * 获取当天初始时间
+     * @param date 时间
+     * @return 初始时间 (yyyy-MM-dd 00:00:00)
+     */
+    public static Date getInitialTime(Date date){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+        String dateStr = dateFormat.format(date);
+        try {
+            return dateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 获取当天最后时间
+     * @param date 时间
+     * @return 最后时间 (yyyy-MM-dd 23:59:59)
+     */
+    public static Date getTerminalTime(Date date){
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateStr = dateFormat.format(date);
+        dateStr = dateStr + " 23:59:59" ;
+
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            return dateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

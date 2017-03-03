@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 
 /**
@@ -82,6 +83,11 @@ public class TelemetryService {
             ObdLocation returnObdLocation = obdLocationRepository.save(obdLocation);
             System.out.println(returnObdLocation);
         }
+    }
+
+    public void deleteByVinAndTime(String vin, Date dateBegin, Date dateEnd)
+    {
+        obdLocationRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
     }
 
 }

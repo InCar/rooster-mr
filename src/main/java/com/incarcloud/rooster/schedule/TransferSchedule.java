@@ -24,8 +24,9 @@ public class TransferSchedule {
     @Scheduled(fixedRate = 1000 * 60 * 5)   // 从程序启动开始，每5分钟执行一次
     public void transferAllVehicle()
     {
-        Date dateEnd = new Date();
-        Date dateBegin = DateUtil.plusMinutes(dateEnd,-5);
+        Date now = new Date();
+        Date dateBegin = DateUtil.getInitialTime(now);
+        Date dateEnd = DateUtil.getTerminalTime(now);
         vehicleService.transferAllVehicle(dateBegin,dateEnd);
     }
 }

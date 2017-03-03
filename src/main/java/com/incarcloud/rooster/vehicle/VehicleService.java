@@ -69,7 +69,8 @@ public class VehicleService {
                 String key = row.getPrimaryKey().getPrimaryKeyColumn(PRIMARY_KEY_NAME).getValue().asString();
                 System.out.println("Vehicle Key: " + key);
                 transferVehicle(key);                                // 转存单个车辆数据
-                transferVehiclePos(client,key,dateBegin,dateEnd);    // 转存单个车辆位置数据
+                deleteVehiclePos(key,dateBegin,dateEnd);             // 删除单个车辆整天位置数据
+                transferVehiclePos(client,key,dateBegin,dateEnd);    // 转存单个车辆整天位置数据
             }
             // 若nextStartPrimaryKey不为null, 则继续读取.
             if (getRangeResponse.getNextStartPrimaryKey() != null) {
@@ -87,15 +88,25 @@ public class VehicleService {
     public void transferVehicle(String key)
     {
         int s4Id = 961;
-        String obdCode = key.substring(4,21);
-        String license = obdCode;
+        String vin = key.substring(4,21);
+        String license = vin;
 
         Car checkResult = carRepository.findByLicense(license);
         if(checkResult==null)
         {
-            Car car = new Car(s4Id,license,obdCode);
+            Car car = new Car(s4Id,license,vin);
             carRepository.save(car);
         }
+    }
+
+    /**
+     * 删除整天的数据
+     * @param key
+     */
+    public void deleteVehiclePos(String key, Date dateBegin, Date dateEnd)
+    {
+        String vin = key.substring(4,21);
+        telemetryService.deleteByVinAndTime(vin,dateBegin,dateEnd);
     }
 
     /**
