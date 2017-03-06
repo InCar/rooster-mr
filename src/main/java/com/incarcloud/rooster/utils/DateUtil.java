@@ -61,6 +61,20 @@ public class DateUtil {
     }
 
     /**
+     * 在时间上增加天
+     * @param date 时间
+     * @param days 天数
+     * @return 增加后的时间
+     */
+    public static Date plusDays(Date date,int days)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE,days);
+        return calendar.getTime();
+    }
+
+    /**
      * 获取当天初始时间
      * @param date 时间
      * @return 初始时间 (yyyy-MM-dd 00:00:00)

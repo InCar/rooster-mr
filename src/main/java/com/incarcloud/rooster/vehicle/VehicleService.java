@@ -69,10 +69,9 @@ public class VehicleService {
                 String key = row.getPrimaryKey().getPrimaryKeyColumn(PRIMARY_KEY_NAME).getValue().asString();
                 System.out.println("Vehicle Key: " + key);
 
-                transferVehicle(key);                                // 转存单个车辆数据
-
-                deleteVehicleData(key,dateBegin,dateEnd);             // 删除单个车辆整天数据
-                transferVehiclePos(client,key,dateBegin,dateEnd);    // 转存单个车辆整天位置数据
+                transferVehicle(key);                                     // 转存单个车辆信息
+                deleteVehicleData(key,dateBegin,dateEnd);                 // 删除单个车辆数据
+                transferVehiclePos(client,key,dateBegin,dateEnd);         // 转存单个车辆位置数据
                 transferVehicleMobileye(client, key, dateBegin, dateEnd); // 转存单个车辆Mobileye数据
 
             }
