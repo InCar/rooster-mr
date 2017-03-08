@@ -31,8 +31,8 @@ public class TransferSchedule {
         Date dateEnd = new Date();
         Date dateBegin = DateUtil.plusDays(dateEnd,-1);
 
-        s_logger.info("\n-----schedule: {} -> {} -----", dateBegin, dateEnd);
+        s_logger.info("\n\n----- schedule: {} -> {} -----", dateBegin, dateEnd);
         vehicleService.transferAllVehicle(dateBegin,dateEnd);
-        s_logger.info("----- schedule end -----");
+        s_logger.info("\n----- end: {} -> {} -----", dateBegin, dateEnd);
     }
 }
