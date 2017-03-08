@@ -112,7 +112,7 @@ public class TelemetryService {
 
             ObdLocation obdLocation = new ObdLocation(obdCode,tripId,vin,longitude,latitude,timestamp);
             ObdLocation returnObdLocation = obdLocationRepository.save(obdLocation);
-            s_logger.info(returnObdLocation.toString());
+            s_logger.debug(returnObdLocation.toString());
         }
     }
 
