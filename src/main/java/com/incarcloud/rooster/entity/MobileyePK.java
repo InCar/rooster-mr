@@ -22,8 +22,8 @@ public class MobileyePK implements Serializable {
         this.tm = tm;
     }
 
-    protected String vin;
-    protected Date tm;
+    private String vin;
+    private Date tm;
 
     public boolean equals(Object target){
         if(target.getClass() != this.getClass()) return false;
