@@ -90,4 +90,8 @@ public class ObdLocation {
     public void setLocationTime(Timestamp locationTime) {
         this.locationTime = locationTime;
     }
+
+    public String toString(){
+        return String.format("obdCode: %s, tripId: %s, vin: %s, lon: %s, lat: %s, locationTime: %s", obdCode, tripId, vin, longitude, latitude, locationTime);
+    }
 }

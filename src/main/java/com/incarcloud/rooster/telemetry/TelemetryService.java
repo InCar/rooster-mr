@@ -9,6 +9,8 @@ import com.incarcloud.rooster.repository.MobileyeSTDRepository;
 import com.incarcloud.rooster.repository.ObdLocationRepository;
 import com.incarcloud.rooster.utils.DateUtil;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,8 @@ public class TelemetryService {
 
     private static String TABLE_NAME = "telemetry";
     private static String PRIMARY_KEY_NAME = "key";
+
+    private static Logger s_logger = LoggerFactory.getLogger(TelemetryService.class);
 
     /**
      * 转存单个车辆位置数据
@@ -54,7 +58,7 @@ public class TelemetryService {
             for (Row row : getRangeResponse.getRows()) {
                 String key = row.getPrimaryKey().getPrimaryKeyColumn(PRIMARY_KEY_NAME).getValue().asString();
                 String data = row.getLatestColumn("data").getValue().asString();
-                System.out.println("Telemetry Data: " + data);
+                s_logger.info("Telemetry Data: {}", data);
                 if(flag == TelemetryFlag.Position)
                     transferOnePos(key,data);   // 转存单条位置数据
                 else if(flag == TelemetryFlag.Mobileye)
@@ -90,7 +94,7 @@ public class TelemetryService {
 
             ObdLocation obdLocation = new ObdLocation(obdCode,tripId,vin,longitude,latitude,timestamp);
             ObdLocation returnObdLocation = obdLocationRepository.save(obdLocation);
-            System.out.println(returnObdLocation);
+            s_logger.info(returnObdLocation.toString());
         }
     }
 

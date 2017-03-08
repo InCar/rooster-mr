@@ -7,6 +7,8 @@ import com.incarcloud.rooster.repository.CarRepository;
 import com.incarcloud.rooster.telemetry.TelemetryFlag;
 import com.incarcloud.rooster.telemetry.TelemetryService;
 import com.incarcloud.rooster.utils.DateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,8 @@ public class VehicleService {
     private static String PRIMARY_KEY_NAME = "key";
     private static String TELEMETRY_POS_TYPE = "TriAdas.Pos####";
 
+    private static Logger s_logger = LoggerFactory.getLogger(VehicleService.class);
+
     /**
      * 转存车辆位置数据
      * @param dateBegin 日期范围起始
@@ -67,7 +71,7 @@ public class VehicleService {
             GetRangeResponse getRangeResponse = client.getRange(new GetRangeRequest(rangeRowQueryCriteria));
             for (Row row : getRangeResponse.getRows()) {
                 String key = row.getPrimaryKey().getPrimaryKeyColumn(PRIMARY_KEY_NAME).getValue().asString();
-                System.out.println("Vehicle Key: " + key);
+                s_logger.info("Vehicle Key: {}", key);
 
                 transferVehicle(key);                                     // 转存单个车辆信息
                 deleteVehicleData(key,dateBegin,dateEnd);                 // 删除单个车辆数据
