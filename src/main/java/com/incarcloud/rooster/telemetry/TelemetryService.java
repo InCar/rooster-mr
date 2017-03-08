@@ -3,6 +3,7 @@ package com.incarcloud.rooster.telemetry;
 import com.alicloud.openservices.tablestore.SyncClient;
 import com.alicloud.openservices.tablestore.model.*;
 import com.incarcloud.rooster.entity.MobileyeSTD;
+import com.incarcloud.rooster.entity.MobileysPK;
 import com.incarcloud.rooster.entity.ObdLocation;
 import com.incarcloud.rooster.repository.MobileyeSTDRepository;
 import com.incarcloud.rooster.repository.ObdLocationRepository;
@@ -114,8 +115,10 @@ public class TelemetryService {
         JSONObject jsonTSR = json.getJSONObject("TSR");
 
         MobileyeSTD entry = new MobileyeSTD();
-        entry.setVin(key.substring(4, 21));
-        entry.setTm(DateUtil.parseStrToDate(key.substring(key.length()-14,key.length()), "yyyyMMddHHmmss"));
+        MobileysPK pk = new MobileysPK();
+        pk.setVin(key.substring(4, 21));
+        pk.setTm(DateUtil.parseStrToDate(key.substring(key.length()-14,key.length()), "yyyyMMddHHmmss"));
+        entry.setPk(pk);
         entry.setSound(json.getString("sound"));
         entry.setDaylight(json.getString("daylight"));
         entry.setStopped(json.getBoolean("stopped"));

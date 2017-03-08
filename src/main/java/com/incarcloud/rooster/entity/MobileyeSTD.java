@@ -1,16 +1,14 @@
 package com.incarcloud.rooster.entity;
 
 import javax.persistence.*;
-import java.util.*;
 
 @Entity
 @Table(name = "t_mobileye_std")
 public class MobileyeSTD {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String vin;
-    private Date tm;
+    @EmbeddedId
+    private MobileysPK pk;
+
     private String sound;
     private String daylight;
     private boolean isStopped;
@@ -30,20 +28,12 @@ public class MobileyeSTD {
     private boolean failSafe;
     private int errorCode;
 
-    public String getVin() {
-        return vin;
+    public MobileysPK getPk() {
+        return pk;
     }
 
-    public void setVin(String vin) {
-        this.vin = vin;
-    }
-
-    public Date getTm() {
-        return tm;
-    }
-
-    public void setTm(Date tm) {
-        this.tm = tm;
+    public void setPk(MobileysPK pk) {
+        this.pk = pk;
     }
 
     public String getSound() {
