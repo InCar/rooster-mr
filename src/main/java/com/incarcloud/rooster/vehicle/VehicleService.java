@@ -67,9 +67,11 @@ public class VehicleService {
         primaryKeyBuilder.addPrimaryKeyColumn(PRIMARY_KEY_NAME, PrimaryKeyValue.fromString(endPkValue));
         rangeRowQueryCriteria.setExclusiveEndPrimaryKey(primaryKeyBuilder.build());
         rangeRowQueryCriteria.setMaxVersions(1);
+        int count = 0;
         while (true) {
             GetRangeResponse getRangeResponse = client.getRange(new GetRangeRequest(rangeRowQueryCriteria));
             for (Row row : getRangeResponse.getRows()) {
+                count++;
                 String key = row.getPrimaryKey().getPrimaryKeyColumn(PRIMARY_KEY_NAME).getValue().asString();
                 s_logger.info("Vehicle Key: {}", key);
 
@@ -77,6 +79,9 @@ public class VehicleService {
                 deleteVehicleData(key,dateBegin,dateEnd);                 // 删除单个车辆数据
                 transferVehiclePos(client,key,dateBegin,dateEnd);         // 转存单个车辆位置数据
                 transferVehicleMobileye(client, key, dateBegin, dateEnd); // 转存单个车辆Mobileye数据
+                transferVehicleMobileyeInfo(client, key, dateBegin, dateEnd); // 转存单个车辆Mobileye Car INfo数据
+                transferVehicleMobileyeTSR(client, key, dateBegin, dateEnd); // 转存单个车辆Mobileye TSR数据
+                transferVehicleMobileyeTSRD(client, key, dateBegin, dateEnd); // 转存单个车辆Mobileye TSRD数据
 
             }
             // 若nextStartPrimaryKey不为null, 则继续读取.
@@ -86,6 +91,7 @@ public class VehicleService {
                 break;
             }
         }
+        s_logger.info("Total {} vehicles were transfered", count);
     }
 
     /**
@@ -135,5 +141,29 @@ public class VehicleService {
         String startPkValue = key + TELEMETRY_MOBILEYE + DateUtil.getDateStr(dateBegin,"yyyyMMddHHmmss");
         String endPkValue = key + TELEMETRY_MOBILEYE + DateUtil.getDateStr(dateEnd,"yyyyMMddHHmmss");
         telemetryService.transferTelemetry(client,startPkValue,endPkValue, TelemetryFlag.Mobileye);
+    }
+
+    public void transferVehicleMobileyeInfo(SyncClient client, String key, Date dateBegin, Date dateEnd){
+        final String TELEMETRY_MOBILEYE = "TriAdas.CarInfo";
+
+        String startPkValue = key + TELEMETRY_MOBILEYE + DateUtil.getDateStr(dateBegin,"yyyyMMddHHmmss");
+        String endPkValue = key + TELEMETRY_MOBILEYE + DateUtil.getDateStr(dateEnd,"yyyyMMddHHmmss");
+        telemetryService.transferTelemetry(client,startPkValue,endPkValue, TelemetryFlag.Info);
+    }
+
+    public void transferVehicleMobileyeTSR(SyncClient client, String key, Date dateBegin, Date dateEnd){
+        final String TELEMETRY_MOBILEYE = "TriAdas.TSR####";
+
+        String startPkValue = key + TELEMETRY_MOBILEYE + DateUtil.getDateStr(dateBegin,"yyyyMMddHHmmss");
+        String endPkValue = key + TELEMETRY_MOBILEYE + DateUtil.getDateStr(dateEnd,"yyyyMMddHHmmss");
+        telemetryService.transferTelemetry(client,startPkValue,endPkValue, TelemetryFlag.TSR);
+    }
+
+    public void transferVehicleMobileyeTSRD(SyncClient client, String key, Date dateBegin, Date dateEnd){
+        final String TELEMETRY_MOBILEYE = "TriAdas.TSRD###";
+
+        String startPkValue = key + TELEMETRY_MOBILEYE + DateUtil.getDateStr(dateBegin,"yyyyMMddHHmmss");
+        String endPkValue = key + TELEMETRY_MOBILEYE + DateUtil.getDateStr(dateEnd,"yyyyMMddHHmmss");
+        telemetryService.transferTelemetry(client,startPkValue,endPkValue, TelemetryFlag.TSRD);
     }
 }

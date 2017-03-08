@@ -5,7 +5,7 @@ import java.io.*;
 import java.util.*;
 
 @Embeddable
-public class MobileysPK implements Serializable {
+public class MobileyePK implements Serializable {
     public String getVin() {
         return vin;
     }
@@ -22,13 +22,13 @@ public class MobileysPK implements Serializable {
         this.tm = tm;
     }
 
-    private String vin;
-    private Date tm;
+    protected String vin;
+    protected Date tm;
 
     public boolean equals(Object target){
-        if(target.getClass() != MobileysPK.class) return false;
+        if(target.getClass() != this.getClass()) return false;
 
-        MobileysPK targetMPK = (MobileysPK)target;
+        MobileyePK targetMPK = (MobileyePK)target;
 
         if(vin == null && tm == null)
             return (targetMPK.vin == null && targetMPK.tm == null);

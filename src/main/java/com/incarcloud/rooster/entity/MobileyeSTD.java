@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class MobileyeSTD {
 
     @EmbeddedId
-    private MobileysPK pk;
+    private MobileyePK pk;
 
     private String sound;
     private String daylight;
@@ -28,11 +28,11 @@ public class MobileyeSTD {
     private boolean failSafe;
     private int errorCode;
 
-    public MobileysPK getPk() {
+    public MobileyePK getPk() {
         return pk;
     }
 
-    public void setPk(MobileysPK pk) {
+    public void setPk(MobileyePK pk) {
         this.pk = pk;
     }
 
