@@ -91,7 +91,7 @@ public class VehicleService {
                 break;
             }
         }
-        s_logger.info("Total {} vehicles were transfered", count);
+        s_logger.info("{} vehicles transferred", count);
     }
 
     /**

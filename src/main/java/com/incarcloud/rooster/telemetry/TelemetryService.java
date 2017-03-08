@@ -88,7 +88,7 @@ public class TelemetryService {
                 break;
             }
         }
-        s_logger.info("Transfered {} data {}", flag.name(), count);
+        s_logger.info("{} {} transferred", flag.name(), count);
     }
 
     /**
