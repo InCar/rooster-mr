@@ -76,11 +76,20 @@ public class VehicleService {
                 s_logger.info("Vehicle Key: {}", key);
 
                 transferVehicle(key);                                     // 转存单个车辆信息
-                deleteVehicleData(key,dateBegin,dateEnd);                 // 删除单个车辆数据
+
+                deleteVehicleData(key,dateBegin,dateEnd, TelemetryFlag.Position);
                 transferVehiclePos(client,key,dateBegin,dateEnd);         // 转存单个车辆位置数据
+
+                deleteVehicleData(key,dateBegin,dateEnd, TelemetryFlag.Mobileye);
                 transferVehicleMobileye(client, key, dateBegin, dateEnd); // 转存单个车辆Mobileye数据
+
+                deleteVehicleData(key,dateBegin,dateEnd, TelemetryFlag.Info);
                 transferVehicleMobileyeInfo(client, key, dateBegin, dateEnd); // 转存单个车辆Mobileye Car INfo数据
+
+                deleteVehicleData(key,dateBegin,dateEnd, TelemetryFlag.TSR);
                 transferVehicleMobileyeTSR(client, key, dateBegin, dateEnd); // 转存单个车辆Mobileye TSR数据
+
+                deleteVehicleData(key,dateBegin,dateEnd, TelemetryFlag.TSRD);
                 transferVehicleMobileyeTSRD(client, key, dateBegin, dateEnd); // 转存单个车辆Mobileye TSRD数据
 
             }
@@ -108,6 +117,7 @@ public class VehicleService {
         if(checkResult==null)
         {
             Car car = new Car(s4Id,license,vin);
+            car.setVinCode(vin);
             carRepository.save(car);
         }
     }
@@ -116,10 +126,10 @@ public class VehicleService {
      * 删除整天的数据
      * @param key
      */
-    public void deleteVehicleData(String key, Date dateBegin, Date dateEnd)
+    public void deleteVehicleData(String key, Date dateBegin, Date dateEnd, TelemetryFlag flag)
     {
         String vin = key.substring(4,21);
-        telemetryService.deleteByVinAndTime(vin,dateBegin,dateEnd);
+        telemetryService.deleteByVinAndTime(vin,dateBegin,dateEnd, flag);
     }
 
     /**

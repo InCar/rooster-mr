@@ -16,6 +16,7 @@ public class Car {
     private int s4Id;
     private String license;
     private String obdCode;
+    private String vinCode;
 
     public Car() {
     }
@@ -56,5 +57,13 @@ public class Car {
 
     public void setObdCode(String obdCode) {
         this.obdCode = obdCode;
+    }
+
+    public String getVinCode() {
+        return vinCode;
+    }
+
+    public void setVinCode(String vinCode) {
+        this.vinCode = vinCode;
     }
 }

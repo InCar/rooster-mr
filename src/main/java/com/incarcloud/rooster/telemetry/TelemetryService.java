@@ -264,12 +264,17 @@ public class TelemetryService {
         mobileyeTSRDRepository.save(listTSRD);
     }
 
-    public void deleteByVinAndTime(String vin, Date dateBegin, Date dateEnd)
+    public void deleteByVinAndTime(String vin, Date dateBegin, Date dateEnd, TelemetryFlag flag)
     {
-        obdLocationRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
-        mobileyeSTDRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
-        mobileyeInfoRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
-        mobileyeTSRRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
-        mobileyeTSRDRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
+        if(flag == TelemetryFlag.Position)
+            obdLocationRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
+        else if(flag == TelemetryFlag.Mobileye)
+            mobileyeSTDRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
+        else if(flag == TelemetryFlag.Info)
+            mobileyeInfoRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
+        else if(flag == TelemetryFlag.TSR)
+            mobileyeTSRRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
+        else if (flag == TelemetryFlag.TSRD)
+            mobileyeTSRDRepository.deleteByVinAndTime(vin, dateBegin, dateEnd);
     }
 }
