@@ -6,6 +6,7 @@ import com.incarcloud.rooster.entity.*;
 import com.incarcloud.rooster.repository.*;
 import com.incarcloud.rooster.utils.DateUtil;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -180,8 +181,15 @@ public class TelemetryService {
         if(!jsonBeam.getString("high").equals("NA"))
             entry.setBeam_high(jsonBeam.getBoolean("high"));
 
-        if(!json.getString("speed").equals("NA"))
+        try {
             entry.setSpeed(json.getInt("speed"));
+        }
+        catch(JSONException ex){
+            if(!json.getString("speed").equals("NA")) {
+                s_logger.error("Parse speed error: {}, key: {}, json: {}", ex.getMessage(), key, data);
+                throw ex;
+            }
+        }
 
         mobileyeInfoRepository.save(entry);
     }
