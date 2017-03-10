@@ -29,7 +29,7 @@ public class TransferSchedule {
     public void transferAllVehicle()
     {
         Date dateEnd = new Date();
-        Date dateBegin = DateUtil.plusDays(dateEnd,-1);
+        Date dateBegin = DateUtil.plusMinutes(dateEnd, 60);
 
         s_logger.info("\n\n----- schedule: {} -> {} -----", dateBegin, dateEnd);
         vehicleService.transferAllVehicle(dateBegin,dateEnd);
