@@ -44,6 +44,7 @@ public class TelemetryService {
     private static String PRIMARY_KEY_NAME = "key";
 
     private static Logger s_logger = LoggerFactory.getLogger(TelemetryService.class);
+    private static final int PK_TIME_BGN = 36;
 
     /**
      * 转存单个车辆位置数据
@@ -106,8 +107,8 @@ public class TelemetryService {
             String obdCode = vin;
             String longitude = "E" + String.valueOf(json.getDouble("lon"));
             String latitude = "N" + String.valueOf(json.getDouble("lat"));
-            String time = key.substring(key.length()-14,key.length());
-            long millSeconds = DateUtil.parseStrToDate(time,"yyyyMMddHHmmss").getTime();
+            String time = key.substring(PK_TIME_BGN,key.length());
+            long millSeconds = DateUtil.parseStrToDate(time,"yyyyMMddHHmmssSSS").getTime();
             int tripId = (int)(millSeconds/86400000D);
             Timestamp timestamp = new Timestamp(millSeconds);
 
@@ -133,7 +134,7 @@ public class TelemetryService {
         MobileyeSTD entry = new MobileyeSTD();
         MobileyePK pk = new MobileyePK();
         pk.setVin(key.substring(4, 21));
-        pk.setTm(DateUtil.parseStrToDate(key.substring(key.length()-14,key.length()), "yyyyMMddHHmmss"));
+        pk.setTm(DateUtil.parseStrToDate(key.substring(PK_TIME_BGN,key.length()), "yyyyMMddHHmmssSSS"));
         entry.setPk(pk);
         entry.setSound(json.getString("sound"));
         entry.setDaylight(json.getString("daylight"));
@@ -164,7 +165,7 @@ public class TelemetryService {
 
         MobileyePK pk = new MobileyePK();
         pk.setVin(key.substring(4, 21));
-        pk.setTm(DateUtil.parseStrToDate(key.substring(key.length()-14,key.length()), "yyyyMMddHHmmss"));
+        pk.setTm(DateUtil.parseStrToDate(key.substring(PK_TIME_BGN,key.length()), "yyyyMMddHHmmssSSS"));
 
         MobileyeInfo entry = new MobileyeInfo();
         entry.setPk(pk);
@@ -205,7 +206,7 @@ public class TelemetryService {
         List<MobileyeTSR> listTSR = new ArrayList<>();
 
         String vin = key.substring(4, 21);
-        Date tm = DateUtil.parseStrToDate(key.substring(key.length()-14,key.length()), "yyyyMMddHHmmss");
+        Date tm = DateUtil.parseStrToDate(key.substring(PK_TIME_BGN,key.length()), "yyyyMMddHHmmssSSS");
 
         JSONArray array = new JSONArray(data);
         int i = 0;
@@ -245,7 +246,7 @@ public class TelemetryService {
         List<MobileyeTSRD> listTSRD = new ArrayList<>();
 
         String vin = key.substring(4, 21);
-        Date tm = DateUtil.parseStrToDate(key.substring(key.length()-14,key.length()), "yyyyMMddHHmmss");
+        Date tm = DateUtil.parseStrToDate(key.substring(PK_TIME_BGN,key.length()), "yyyyMMddHHmmssSSS");
 
         JSONArray array = new JSONArray(data);
         int i = 0;
