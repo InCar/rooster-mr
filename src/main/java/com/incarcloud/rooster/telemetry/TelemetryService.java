@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -99,22 +100,27 @@ public class TelemetryService {
      */
     public void transferOnePos(String key, String data)
     {
-        JSONObject json = new JSONObject(data);
-        boolean valid = json.getBoolean("valid");
-        if(valid)
-        {
-            String vin = key.substring(4,21);
-            String obdCode = vin;
-            String longitude = "E" + String.valueOf(json.getDouble("lon"));
-            String latitude = "N" + String.valueOf(json.getDouble("lat"));
-            String time = key.substring(PK_TIME_BGN,key.length());
-            long millSeconds = DateUtil.parseStrToDate(time,"yyyyMMddHHmmssSSS").getTime();
-            int tripId = (int)(millSeconds/86400000D);
-            Timestamp timestamp = new Timestamp(millSeconds);
+        try {
+            JSONObject json = new JSONObject(data);
+            boolean valid = json.getBoolean("valid");
+            if (valid) {
+                String vin = key.substring(4, 21);
+                String obdCode = vin;
+                String longitude = "E" + String.valueOf(json.getDouble("lon"));
+                String latitude = "N" + String.valueOf(json.getDouble("lat"));
+                String time = key.substring(PK_TIME_BGN, key.length());
+                long millSeconds = DateUtil.parseStrToDate(time, "yyyyMMddHHmmssSSS").getTime();
+                int tripId = (int) (millSeconds / 86400000D);
+                Timestamp timestamp = new Timestamp(millSeconds);
 
-            ObdLocation obdLocation = new ObdLocation(obdCode,tripId,vin,longitude,latitude,timestamp);
-            ObdLocation returnObdLocation = obdLocationRepository.save(obdLocation);
-            s_logger.debug(returnObdLocation.toString());
+                ObdLocation obdLocation = new ObdLocation(obdCode, tripId, vin, longitude, latitude, timestamp);
+                ObdLocation returnObdLocation = obdLocationRepository.save(obdLocation);
+                s_logger.debug(returnObdLocation.toString());
+            }
+        }
+        catch(DataIntegrityViolationException ex){
+            // 忽略这个错误,1秒内多个数据
+            s_logger.warn("忽略1秒内的多个位置数据 {}", ex.toString());
         }
     }
 
