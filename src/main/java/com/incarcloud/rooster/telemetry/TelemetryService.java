@@ -47,6 +47,47 @@ public class TelemetryService {
     private static Logger s_logger = LoggerFactory.getLogger(TelemetryService.class);
     private static final int PK_TIME_BGN = 36;
 
+    private List<ObdLocation> _listPos = new ArrayList<>();
+    private List<MobileyeSTD> _listMeSTD = new ArrayList<>();
+    private List<MobileyeInfo> _listMeInfo = new ArrayList<>();
+    private List<MobileyeTSR> _listMeTSR = new ArrayList<>();
+    private List<MobileyeTSRD> _listMeTSRD = new ArrayList<>();
+
+    void beginTransfer(){
+        _listPos.clear();
+        _listMeSTD.clear();
+        _listMeInfo.clear();
+        _listMeTSR.clear();
+        _listMeTSRD.clear();
+    }
+
+    void endTransfer(){
+        if(_listPos.size() > 0){
+            obdLocationRepository.save(_listPos);
+            _listPos.clear();
+        }
+
+        if(_listMeSTD.size() > 0){
+            mobileyeSTDRepository.save(_listMeSTD);
+            _listMeSTD.clear();
+        }
+
+        if(_listMeInfo.size() > 0){
+            mobileyeInfoRepository.save(_listMeInfo);
+            _listMeInfo.clear();
+        }
+
+        if(_listMeTSR.size() > 0){
+            mobileyeTSRRepository.save(_listMeTSR);
+            _listMeTSR.clear();
+        }
+
+        if(_listMeTSRD.size() > 0){
+            mobileyeTSRDRepository.save(_listMeTSRD);
+            _listMeTSRD.clear();
+        }
+    }
+
     /**
      * 转存单个车辆位置数据
      * @param client 表格存储客户端
@@ -68,6 +109,7 @@ public class TelemetryService {
         int count = 0;
         while (true) {
             GetRangeResponse getRangeResponse = client.getRange(new GetRangeRequest(rangeRowQueryCriteria));
+            beginTransfer();
             for (Row row : getRangeResponse.getRows()) {
                 count++;
                 String key = row.getPrimaryKey().getPrimaryKeyColumn(PRIMARY_KEY_NAME).getValue().asString();
@@ -84,6 +126,7 @@ public class TelemetryService {
                 else if(flag == TelemetryFlag.TSRD)
                     transferOneMobileyeTSRD(key, data);
             }
+            endTransfer();
             // 若nextStartPrimaryKey不为null, 则继续读取.
             if (getRangeResponse.getNextStartPrimaryKey() != null) {
                 rangeRowQueryCriteria.setInclusiveStartPrimaryKey(getRangeResponse.getNextStartPrimaryKey());
@@ -114,8 +157,7 @@ public class TelemetryService {
                 Timestamp timestamp = new Timestamp(millSeconds);
 
                 ObdLocation obdLocation = new ObdLocation(obdCode, tripId, vin, longitude, latitude, timestamp);
-                ObdLocation returnObdLocation = obdLocationRepository.save(obdLocation);
-                s_logger.debug(returnObdLocation.toString());
+                _listPos.add(obdLocation);
             }
         }
         catch(DataIntegrityViolationException ex){
@@ -161,7 +203,7 @@ public class TelemetryService {
         entry.setFailSafe(json.getBoolean("failsafe"));
         entry.setErrorCode(json.getInt("error"));
 
-        mobileyeSTDRepository.save(entry);
+        _listMeSTD.add(entry);
     }
 
     public void transferOneMobileyeInfo(String key, String data){
@@ -198,7 +240,7 @@ public class TelemetryService {
             }
         }
 
-        mobileyeInfoRepository.save(entry);
+        _listMeInfo.add(entry);
     }
 
     public void transferOneMobileyeTSR(String key, String data){
@@ -209,7 +251,6 @@ public class TelemetryService {
         //  {"flag":"Regular","speed":10,"flag2":"NA","pos":{"x":0,"y":0,"z":0},"filter":"NA"},
         //  {"flag":"Regular","speed":10,"flag2":"NA","pos":{"x":0,"y":0,"z":0},"filter":"NA"},
         //  {"flag":"Regular","speed":10,"flag2":"NA","pos":{"x":0,"y":0,"z":0},"filter":"NA"}]
-        List<MobileyeTSR> listTSR = new ArrayList<>();
 
         String vin = key.substring(4, 21);
         Date tm = DateUtil.parseStrToDate(key.substring(PK_TIME_BGN,key.length()), "yyyyMMddHHmmssSSS");
@@ -236,12 +277,10 @@ public class TelemetryService {
             tsr.setY((float) jsonPos.getDouble("y"));
             tsr.setZ((float) jsonPos.getDouble("z"));
 
-            listTSR.add(tsr);
+            _listMeTSR.add(tsr);
 
             i++;
         }
-
-        mobileyeTSRRepository.save(listTSR);
     }
 
     public void transferOneMobileyeTSRD(String key, String data){
@@ -249,7 +288,6 @@ public class TelemetryService {
         //  {"flag":"Regular","speed":10,"flag2":"NA"},
         //  {"flag":"Regular","speed":10,"flag2":"NA"},
         //  {"flag":"Regular","speed":10,"flag2":"NA"}]
-        List<MobileyeTSRD> listTSRD = new ArrayList<>();
 
         String vin = key.substring(4, 21);
         Date tm = DateUtil.parseStrToDate(key.substring(PK_TIME_BGN,key.length()), "yyyyMMddHHmmssSSS");
@@ -271,12 +309,10 @@ public class TelemetryService {
             tsr.setFlag2(json.getString("flag2"));
             tsr.setSpeed(json.getInt("speed"));
 
-            listTSRD.add(tsr);
+            _listMeTSRD.add(tsr);
 
             i++;
         }
-
-        mobileyeTSRDRepository.save(listTSRD);
     }
 
     public void deleteByVinAndTime(String vin, Date dateBegin, Date dateEnd, TelemetryFlag flag)
