@@ -64,26 +64,31 @@ public class TelemetryService {
     void endTransfer(){
         if(_listPos.size() > 0){
             obdLocationRepository.save(_listPos);
+            s_logger.info("pos {}", _listPos.size());
             _listPos.clear();
         }
 
         if(_listMeSTD.size() > 0){
             mobileyeSTDRepository.save(_listMeSTD);
+            s_logger.info("mobileye std {}", _listMeSTD.size());
             _listMeSTD.clear();
         }
 
         if(_listMeInfo.size() > 0){
             mobileyeInfoRepository.save(_listMeInfo);
+            s_logger.info("mobileye info {}", _listMeInfo.size());
             _listMeInfo.clear();
         }
 
         if(_listMeTSR.size() > 0){
             mobileyeTSRRepository.save(_listMeTSR);
+            s_logger.info("mobileye tsr {}", _listMeTSR.size());
             _listMeTSR.clear();
         }
 
         if(_listMeTSRD.size() > 0){
             mobileyeTSRDRepository.save(_listMeTSRD);
+            s_logger.info("mobileye tsrd {}", _listMeTSRD.size());
             _listMeTSRD.clear();
         }
     }
